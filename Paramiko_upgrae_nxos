@@ -1,0 +1,37 @@
+import paramiko
+import time
+import getpass
+
+ssh_client = paramiko.SSHClient()
+# print(type(ssh_client))
+ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())  #it will accept automatically server key...
+# sh_client.connect(hostname='192.168.110.137', port=22, username='cisco', password='cisco',
+#                  look_for_keys=False, allow_agent=False)
+
+#password = getpass.getpass("Enter password:")
+#router = {'hostname':'192.168.110.137', 'port':'22', "username": "cisco", "password": password}
+
+N9K1 = {'hostname':'172.16.31.151', 'port':'22', "username": "admin", "password": 'admin123!'}
+N9K2 = {'hostname':'172.16.31.152', 'port':'22', "username": "admin", "password": 'admin123!'}
+#router3 = {'hostname':'192.168.110.139', 'port':'22', "username": "cisco", "password": 'cisco'}
+
+devices = [N9K1, N9K2]
+
+for device in devices:
+    print(f'Connecting to {device["hostname"]}')
+    ssh_client.connect(**device, look_for_keys=False, allow_agent=False)
+    shell = ssh_client.invoke_shell()
+    shell.send("copy ftp://username:password@172.16.18.111/nxos.9.3.9.bin bootflash: vrf management\n")   #FTP server username and password
+    time.sleep(300)
+
+# for device in devices:
+#     print(f'Checking the image if loaded')
+#     ssh_client.connect(**device, look_for_keys=False, allow_agent=False)
+#     shell = ssh_client.invoke_shell()
+#     shell.send("dir bootflash: | inc \"9.3.9\"\n")
+#     time.sleep(3)
+#     output = shell.recv(10000)
+#     print(output.decode('utf-8'))
+#     # if ssh_client.get_transport().is_active() == True:
+#     # print("Closing connection")
+    # ssh_client.close()
