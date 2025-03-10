@@ -11,8 +11,8 @@ ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())  #it will accep
 #password = getpass.getpass("Enter password:")
 #router = {'hostname':'192.168.110.137', 'port':'22', "username": "cisco", "password": password}
 
-N9K1 = {'hostname':'172.16.31.151', 'port':'22', "username": "admin", "password": 'admin123!'}
-N9K2 = {'hostname':'172.16.31.152', 'port':'22', "username": "admin", "password": 'admin123!'}
+N9K1 = {'hostname':'172.16.31.151', 'port':'22', "username": "admin", "password": 'password'}
+N9K2 = {'hostname':'172.16.31.152', 'port':'22', "username": "admin", "password": 'password'}
 #router3 = {'hostname':'192.168.110.139', 'port':'22', "username": "cisco", "password": 'cisco'}
 
 devices = [N9K1, N9K2]
@@ -21,7 +21,7 @@ for device in devices:
     print(f'Connecting to {device["hostname"]}')
     ssh_client.connect(**device, look_for_keys=False, allow_agent=False)
     shell = ssh_client.invoke_shell()
-    shell.send("copy ftp://username:password@172.16.18.111/nxos.9.3.9.bin bootflash: vrf management\n")   #FTP server username and password
+    shell.send("copy ftp://username:password@FTP_ADDRESS/nxos.9.3.9.bin bootflash: vrf management\n")   #FTP server username and password
     time.sleep(300)
 
 # for device in devices:
