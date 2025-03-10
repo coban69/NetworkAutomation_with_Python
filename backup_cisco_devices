@@ -1,0 +1,62 @@
+from netmiko import ConnectHandler
+from datetime import datetime
+import time
+import threading
+import sys
+import getpass
+
+start = time.time()
+tme = datetime.now()
+year = tme.year
+month = tme.month
+day = tme.day
+hour = tme.hour
+minute=tme.minute
+sec = tme.second
+
+try:
+    userName = input("username: ")
+    passWord = getpass("password: ")
+except KeyboardInterrupt:
+    sys.exit()
+
+def backup(device):
+
+    conn = ConnectHandler(**device)
+    print("Entering the enable mode of {}".format(device['host']))
+    conn.enable()
+    output = conn.send_command("sh run")
+
+    hostname = conn.find_prompt()[0:-1]
+    filename = f"{hostname}-{device['host']}-{year}-{month}-{day}-{hour}.{minute}.{sec}-backup.txt"
+
+    with open(filename, 'w') as b:
+        b.write(output)
+        print(f"Backup of {hostname}-{device['host']} is completed.")
+        print("#" * 40)
+        conn.disconnect()
+
+
+with open("devices.txt") as f:
+    devices = f.read().splitlines()
+
+threads = list()
+
+for ip in devices:
+    cisco_device = {
+        'device_type': 'cisco_ios',
+        'host': ip,
+        'username': userName,
+        'password': passWord,
+        'port': '22',
+        'secret': 'cisco'
+    }
+    th = threading.Thread(target=backup, args=(cisco_device,))
+    threads.append(th)
+for th in threads:
+    th.start()
+for th in threads:
+    th.join()
+
+stop = time.time()
+print("Total executing time is {} seconds.".format(stop-start))
